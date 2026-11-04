@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4680 Pack Runaway Propagation</title>
+<meta name="description" content="Thermal runaway propagation in a 20-cell 4680 pack, modelled in COMSOL Multiphysics 6.4 by adapting the validated Application Library pack-propagation model. Sharp cascade threshold in through-layer conductivity between 1.0 and 1.25 W/m·K; 12 transient studies; adiabatic stress test; null result on contact resistance.">
+<meta property="og:title" content="Thermal runaway propagation in a 20-cell 4680 pack">
+<meta property="og:description" content="COMSOL 6.4 electro-thermal FEA: cascade threshold in through-layer conductivity between 1.0 and 1.25 W/m·K, 12 one-hour studies, cooling 0 to 2,000 W/m²·K.">
+<meta property="og:image" content="https://soham-cheme.github.io/4680-Thermal-Runaway-Propagation-COMSOL/assets/social-preview.png">
+<meta name="theme-color" content="#0b1220">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='6' y='3' width='20' height='26' rx='5' fill='none' stroke='%23f97316' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23f97316'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/site.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"}}</script>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js">
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lenis@1.3.27/dist/lenis.min.js"></script>
+<script defer src="assets/data.js"></script>
+<script defer src="assets/site.js"></script>
+<script type="module" src="assets/scene.js"></script>
+<style>
+.hud{pointer-events:auto;position:absolute;right:16px;top:66px;display:flex;flex-direction:column;gap:8px;max-width:330px;z-index:3}
+.hero .copy .wrap{padding-right:360px}@media (max-width:900px){.hero .copy .wrap{padding-right:16px}}
+.panel{background:var(--glass);border:1px solid var(--line);border-radius:14px;padding:10px 12px;backdrop-filter:blur(8px);font-size:12.5px;color:var(--muted)}
+.panel b{color:var(--ink)}.panel input[type=range]{width:100%;accent-color:var(--acc);margin:6px 0 2px}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;border:1px solid var(--line);color:var(--ink)}.pill.bad{background:#f9731633;border-color:#f97316}.pill.good{background:#22d3ee33;border-color:#22d3ee}
+.seg{display:inline-flex;gap:4px;background:var(--glass);border:1px solid var(--line);border-radius:999px;padding:3px}.seg button{border:0;background:transparent;color:var(--muted);font-weight:700;font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer}.seg button.on{background:var(--ink);color:var(--bg)}
+.clock{font-variant-numeric:tabular-nums;font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+@media (max-width:640px){.hud{top:60px;left:8px;right:8px;max-width:none;flex-direction:row;flex-wrap:wrap;gap:6px}.panel{flex:1 1 140px;padding:6px 9px;font-size:11px}.panel.wide{flex-basis:100%}.panel .note{display:none}.clock{font-size:18px}.seg button{padding:3px 7px;font-size:11px}.hero .copy{bottom:3vh}.hero h1{font-size:28px}.hero p{font-size:14px;max-width:none;-webkit-line-clamp:4;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}}
+.matrix td.c{background:#f9731633;font-weight:700}.matrix td.a{background:#22d3ee22}.matrix td.i{background:#a78bfa33;font-style:italic}
+.cmp td:last-child{font-weight:700}
+</style>
+<noscript><style>.hero .fallback{opacity:1}.reveal{opacity:1;transform:none}</style></noscript>
+</head>
+<body>
+<nav><div class="wrap"><a class="brand" href="#top">4680 pack propagation</a>
+<div class="links"><a href="#model">Model</a><a href="#matrix">Run matrix</a><a href="#threshold" class="hide-sm">Threshold</a><a href="#surrogate" class="hide-sm">Surrogate</a><a href="#limits" class="hide-sm">Limits</a><a href="https://github.com/Soham-ChemE/4680-Thermal-Runaway-Propagation-COMSOL">GitHub</a></div>
+<button class="toggle" id="themeBtn" aria-label="Toggle dark or light theme" title="Toggle theme">◐</button></div></nav>
+
+<div class="hero-track" id="top"><div class="hero">
+<canvas id="heroCanvas" role="img" aria-label="3D view of a 20-cell 5s4p pack of 4680 cells with acrylic holder frames, steel connectors and a cooled base plate. A cascade of thermal runaway plays as a time animation from the reduced-order surrogate; a slider changes the through-layer conductivity and flips the pack between cascade and arrest."></canvas>
+<img class="fallback" alt="" data-src="assets/hero.png" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+<div class="shade"></div>
+<div class="hud">
+<div class="panel wide"><div class="clock"><span id="heroClock">0 min</span> <span class="note" id="heroCount">1 / 20 ignited</span></div><span class="pill bad" id="heroOutcome">Surrogate</span> <span class="note" id="heroComsol"></span></div>
+<div class="panel"><b>Through-layer conductivity k<sub>tl</sub> = <span id="kVal">1.00</span> W/m·K</b><input id="kSlider" type="range" min="0" max="5" step="1" value="2" aria-label="Through-layer conductivity"><span class="note">0.5 · 0.75 · <b>1.0 · 1.25</b> · 1.5 · 2.0</span></div>
+<div class="panel"><b>Base cooling</b><br><span class="seg" role="group" aria-label="Base cooling"><button data-h="2000" class="on">2,000 W/m²·K</button><button data-h="0">none</button></span> <button class="btn ghost" id="playBtn" style="padding:4px 10px;font-size:12px">Pause</button><br><span class="note">Animation: reduced-order surrogate built in this repo, not the COMSOL run. The COMSOL outcome for the selected cell is shown above.</span></div>
+</div>
+<div class="copy"><div class="wrap">
+<h1>Below 1.25 W/m·K across the windings, one failing cell takes most of the pack with it.</h1>
+<p>A 20-cell 4680 pack in COMSOL Multiphysics 6.4, adapted from the validated Application Library propagation model: 46 × 80 mm cells, 25 Ah, about 110 kJ released per failing cell, one cell forced at one minute, neighbours triggered at 80 °C. Twelve one-hour studies found a sharp cascade threshold in through-layer (radial) conductivity between 1.0 and 1.25 W/m·K that no base cooling from 100 to 2,000 W/m²·K could move, and that disappeared only when all cooling was removed.</p>
+<div class="cta"><a class="btn" href="#matrix">See the run matrix</a><a class="btn ghost" href="https://github.com/Soham-ChemE/4680-Thermal-Runaway-Propagation-COMSOL">Read the record</a></div>
+</div></div>
+<div class="caption" style="right:auto;left:16px">Drag to orbit. Scroll to move the camera over the pack. Cell 1 is the near corner.</div>
+<div class="scrollhint">Scroll</div>
+</div></div>
+
+<div class="stats over"><div class="wrap"><div class="grid">
+<div class="stat reveal"><div class="n" data-count="20" data-format="int">0</div><div class="l">4680 cells, 5s4p, 2 mm gaps, acrylic holders, steel connectors</div></div>
+<div class="stat reveal"><div class="n" data-count="12" data-format="int">0</div><div class="l">transient one-hour COMSOL studies across conductivity and cooling</div></div>
+<div class="stat reveal"><div class="n" data-count="291236" data-format="int">0</div><div class="l">mesh elements, 231 domains, about 2.7 GB</div></div>
+<div class="stat reveal"><div class="n" data-count="110" data-format="int">0<small>kJ</small></div><div class="l">runaway energy per cell, mass-scaled; 80 °C trigger for neighbours</div></div>
+</div></div></div>
+
+<section class="story" id="model"><div class="wrap">
+<div class="eyebrow reveal">01 · What was asked, what was built</div>
+<h2 class="reveal">Does the 4680 format change how runaway spreads, and which resistance controls it?</h2>
+<p class="lead reveal">The tabless 4680 is usually discussed electrically. The question here was thermal: in a pack of large cells, what decides whether one cell's failure propagates? The base model is COMSOL's <i>Thermal Runaway Propagation in a Battery Pack</i> (Battery Design Module), built on the simplified model of Coman, Darcy and White (<i>J. Electrochem. Soc.</i> 169, 040516, 2022). It was adapted to 4680 geometry and energy, not rebuilt.</p>
+<div class="two">
+<div class="tablewrap reveal"><table><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody id="specTable"></tbody></table></div>
+<div class="reveal"><div class="box"><b>The swept parameter, stated precisely</b>In COMSOL's spirally wound Battery Layers node, <code>kT_batt_tl</code> is the <i>through-layer</i> conductivity: across the windings, the radial direction of a cylindrical cell, stock 1 W/m·K. <code>kT_batt_il</code>, along the foils (azimuthal and axial, stock 30 W/m·K), was never changed. The sweep varied the through-layer value. It is not a direct tabless knob: tabless changes how the foil edges connect to the cap, not the bulk conductivity across the layers.</div>
+<div class="box" style="margin-top:14px;border-left-color:var(--acc2)"><b>What is and is not in the repository</b>In: the written record, the run matrix as data, a Python package that reproduces the scaling arguments and generates every figure, a reduced-order surrogate built here, and a claim-by-claim audit. Not in: the COMSOL <code>.mph</code> file, mesh, logs or field data. The work was done on a university machine and only the written record survives.</div></div>
+</div></div></section>
+
+<section class="story alt" id="matrix"><div class="wrap">
+<div class="eyebrow reveal">02 · The run matrix <span class="tag">COMSOL, transcribed</span></div>
+<h2 class="reveal">Twelve one-hour studies. One sharp line between cascade and arrest.</h2>
+<p class="lead reveal">Rows are base cooling h<sub>plate</sub>, columns are through-layer conductivity k<sub>tl</sub>. Scroll through the four phases; the phase map follows.</p>
+<div class="sticky-wrap">
+<div class="sticky-fig"><img class="fig" data-fig="fig_phase_map" src="assets/fig_phase_map_dark.svg" alt="Phase map of the COMSOL run matrix: cascade below 1.0 to 1.25 W/m·K, arrested above; the h = 0, k = 1.0 cell is marked inferred" width="660" height="420"><div class="label" id="phaseLabel"><b>Phase 1 · contact resistance</b>h = 2,000, k = 1.0</div></div>
+<div class="steps" id="phaseSteps">
+<div class="step active" data-step="p1"><h3>Phase 1 · Cap contact resistance</h3><p>Tabbed R<sub>cap</sub> = 10⁻³ against tabless 10⁻⁵ m²·K/W on the pack floor with h<sub>plate</sub> = 2,000. Second ignition 22.6 against 22.9 min: a 100× change moved onset by about 20 s out of 23 min. The acrylic floor's own resistance swamps the contact. Null result.</p></div>
+<div class="step" data-step="p2"><h3>Phase 2 · Through-layer sweep</h3><p>At h<sub>plate</sub> = 2,000: k<sub>tl</sub> = 1.0 cascaded (second ignition 22.9 min, about 13 further cells by 52 min). 1.25, 1.5 and 2.0 stopped at cell 1. A 25 % change in internal conductivity flipped the outcome.</p></div>
+<div class="step" data-step="p3"><h3>Phase 3 · Is it a cooling artefact?</h3><p>At h<sub>plate</sub> = 500 the threshold did not move: 1.0 cascaded at 22.4 min, 1.25 and 1.5 stopped. With Bi ≈ 11 to 46 the inside of the cell, not the plate, is the bottleneck.</p></div>
+<div class="step" data-step="p4"><h3>Phase 4 · Adiabatic stress test</h3><p>At the threshold value 1.25: no cooling at all cascaded (second ignition about 26.9 min, pack average about 260 °C at the end); h = 100 arrested. Near the threshold a cell needs both an internal conduction path and a heat sink. The h = 0, k = 1.0 cell was inferred, never run.</p></div>
+</div></div>
+<div class="tablewrap reveal" style="margin-top:20px"><table class="matrix"><thead><tr><th>h<sub>plate</sub> (W/m²·K)</th><th>k<sub>tl</sub> = 1.0</th><th>1.25</th><th>1.5</th><th>2.0</th></tr></thead><tbody id="matrixTable"></tbody></table><p class="note">R<sub>cap</sub> = 10⁻⁵ m²·K/W, 110 kJ per cell, 25 Ah. The resume counts 12 one-hour studies; the matrix identifies 10 run cells plus the tabbed contact-resistance run, and the notes do not individually identify the twelfth. Ignition counts were read from pack-level probe kinks and are approximate.</p></div>
+</div></section>
+
+<section class="story" id="threshold"><div class="wrap">
+<div class="eyebrow reveal">03 · Why the threshold exists, and the numbers that check it</div>
+<h2 class="reveal">A neighbour triggers on its hottest point, and that point is the skin facing the burning cell.</h2>
+<p class="lead reveal">With low through-layer conductivity, arriving heat piles up at that skin and the local maximum crosses 80 °C. With higher conductivity it spreads inward and down to the cooled base, and the maximum stays below 80 °C. The transition is sharp because the trigger is a step. It is analogous to a thermal-explosion tipping point, but the model has no Arrhenius kinetics, so real self-heating would make it softer and probably shift it.</p>
+<div class="two">
+<div class="card reveal"><img data-fig="fig_energy_balance" src="assets/fig_energy_balance_dark.svg" alt="Adiabatic peak temperature against runaway energy with the 110 kJ point near 325 °C, and diffusion times for 4680 radial, 2170 radial and 4680 axial" width="920" height="360"></div>
+<div class="tablewrap reveal"><table><thead><tr><th>Check (analysis/scaling.py)</th><th class="num">Value</th></tr></thead><tbody id="scaleTable"></tbody></table><p class="note">Each line is one physical estimate from the notes, recomputed and tested in the repository. Real cells reach 600 °C and more: the pulse here is spread over the whole homogenised cell, so total energy is right and peak temperature is under-predicted.</p></div>
+</div>
+<div class="two" style="margin-top:28px;align-items:start">
+<div class="box reveal"><b>Adiabatic stress test</b>At k<sub>tl</sub> = 1.25, h = 0 cascaded and h = 100 arrested, and between 100 and 2,000 the threshold never moved. Biot numbers of 2.3, 11.5 and 46 for h = 100, 500 and 2,000 (L = 23 mm, k = 1) say why: once Bi is well above 1, internal conduction limits heat removal and a stronger plate cannot pull heat out faster than the cell conducts it.</div>
+<div class="box reveal" style="border-left-color:#f97316"><b>Null result on contact resistance</b>A 100× change in R<sub>cap</sub> at the pack floor moved propagation onset by about 20 s in 23 min. The cooled boundary sits behind a few millimetres of acrylic (k ≈ 0.19 W/m·K, about 5 × 10⁻³ to 10⁻² m²·K/W), larger than the tabbed contact resistance. The correct tabless test, contact resistance on each cell's own base face, was not run. <b>This study did not show that tabless stops propagation.</b></div>
+</div>
+</div></section>
+
+<section class="story alt" id="surrogate"><div class="wrap">
+<div class="eyebrow reveal">04 · Reduced-order surrogate <span class="tag">built here, not COMSOL</span></div>
+<h2 class="reveal">A thermal network simple enough to read in one sitting, asked the same question.</h2>
+<p class="lead reveal">Each cell is a core plus five radial shells split into 16 sectors; radial links use k<sub>tl</sub>, azimuthal links use k<sub>il</sub>. Neighbours couple through still air, acrylic holder bridges and steel strips; the cells sit in a wrapped air compartment; base cooling acts on each footprint through the axial path, a 3 mm acrylic floor and 1/h<sub>eff</sub>. Same 110 kJ pulse, same 80 °C maximum-temperature trigger, 0.1 s explicit steps for 60 min. One parameter, the inter-cell coupling (×3.0), was calibrated so the surrogate matches the COMSOL threshold at h = 2,000. The rest is prediction, and the hero animation above plays these traces.</p>
+<div class="two">
+<div class="card reveal"><img data-fig="fig_lumped_phase" src="assets/fig_lumped_phase_dark.svg" alt="Phase map of the surrogate sweep over cooling and conductivity" width="660" height="400"></div>
+<div class="card reveal"><img data-fig="fig_lumped_traces" src="assets/fig_lumped_traces_dark.svg" alt="Per-cell maximum temperature traces from the surrogate for the cascade and the arrested case" width="660" height="380"></div>
+</div>
+<div class="tablewrap reveal" style="margin-top:24px"><table class="cmp"><thead><tr><th>Question</th><th>COMSOL (notes)</th><th>Surrogate</th><th>Agrees?</th></tr></thead><tbody id="cmpTable"></tbody></table><p class="note">Supports: a maximum-temperature trigger on a neighbour's skin gives a sharp threshold in k<sub>tl</sub>; the threshold is insensitive to base cooling between 500 and 2,000; removing the heat sink flips the threshold case back to cascade; base contact resistance is second-order behind the acrylic floor. Does not support: the absolute threshold position, the cascade timing or the cell count. A reading aid for the COMSOL result, not evidence of it.</p></div>
+</div></section>
+
+<section class="story" id="limits"><div class="wrap">
+<div class="eyebrow reveal">05 · Limitations, stated plainly</div>
+<h2 class="reveal">Believe the trends and the mechanism. Calibrate before believing the absolute numbers.</h2>
+<div class="two" style="align-items:start">
+<ul class="lead reveal" style="margin:0;padding-left:20px">
+<li><b>Homogenised cells.</b> Uniform anisotropic solids; no windings, hot spots or internal shorts. A resolved 4680 jelly roll was attempted: the swept mesh inverted and a free mesh passed 25 GB.</li>
+<li><b>Fixed trigger, no chemistry.</b> A prescribed 110 kJ pulse at 80 °C; no SEI, anode or cathode kinetics. The sharpness partly reflects this choice.</li>
+<li><b>No venting, no radiation, no convection</b> in the air gap. Heat crosses by conduction through air, holders and connectors.</li>
+<li><b>Bottom cooling only</b>, on the pack floor, as a simplified case. Not a replica of any production pack.</li>
+<li><b>No experimental validation</b> of the 4680 parameters, no mesh or time-step convergence study, no per-cell probes, one inferred matrix cell, untested sensitivities to trigger temperature, energy, pulse duration, gap and holder material.</li>
+</ul>
+<div class="reveal"><pre><code>git clone https://github.com/Soham-ChemE/4680-Thermal-Runaway-Propagation-COMSOL.git
+cd 4680-Thermal-Runaway-Propagation-COMSOL
+pip install -r requirements.txt
+./reproduce.sh            # surrogate sweep, page data, figures, README hero, tests
+python -m analysis.scaling   # the scaling checks
+python -m analysis.matrix    # validates results/matrix.json</code></pre>
+<p class="note">The COMSOL studies cannot be re-run from the repository. Sources: COMSOL Application Library 107571 and its 6.4 documentation page; Coman, Darcy and White, <i>J. Electrochem. Soc.</i> 169, 040516 (2022); the author's project notes, transcribed claim by claim in <a href="https://github.com/Soham-ChemE/4680-Thermal-Runaway-Propagation-COMSOL/blob/main/docs/CLAIMS.md">docs/CLAIMS.md</a>.</p></div>
+</div></div></section>
+
+<footer><div class="wrap"><div><b style="color:var(--ink)">Soham Kavathekar</b> · MS Chemical &amp; Biomolecular Engineering, University of Pennsylvania<br><a href="mailto:stg3719@seas.upenn.edu">stg3719@seas.upenn.edu</a> · <a href="https://www.linkedin.com/in/soham-kavathekar-cheme">linkedin.com/in/soham-kavathekar-cheme</a> · <a href="https://github.com/Soham-ChemE">github.com/Soham-ChemE</a></div><div>COMSOL 6.4 · three.js 0.186 · GSAP 3.15 · Lenis 1.3 · <a href="DESIGN.md">design notes</a></div></div></footer>
+
+<script>
+document.addEventListener('siteready',()=>{
+  const D=window.TR4680, S=window.SITE, M=D.matrix.model, sc=D.scaling, L=D.lumped;
+  const f=(v,d=0)=>(+v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
+  S.table('specTable',[['Pack',M.pack],['Cell',`${M.cell_diameter_mm} × ${M.cell_height_mm} mm homogenised cylinder, ${f(sc.cell_mass_kg,3)} kg at ${f(M.density_kg_m3)} kg/m³`],['Capacity',`${M.capacity_Ah} Ah per cell (100 A at 1C for the pack)`],['Runaway',`${M.pulse}, total ${M.runaway_energy_kJ} kJ`],['Thermal',`ρ ${f(M.density_kg_m3)} kg/m³, cₚ ${f(M.cp_J_kgK)} J/kg·K, k_il ${M.k_in_layer_W_mK}, k_tl ${M.k_through_layer_stock_W_mK} W/m·K (stock)`],['Trigger',`cell 1 forced at ${M.initiating_cell_time_min} min; others at max T > ${M.trigger_C} °C`],['Cooling',`ambient ${M.ambient_h_W_m2K} W/m²·K at ${M.ambient_T_C} °C; ${M.cooled_boundary}`],['Mesh',`${f(M.mesh_elements)} elements, ${M.domains} domains, ${f(M.boundaries)} boundaries`],['Study',`${M.study_minutes} min, output every ${M.output_every_min} min, first step ${M.initial_step_s} s`]]);
+  const g={}; D.matrix.runs.forEach(r=>{(g[r.h_plate]=g[r.h_plate]||{})[r.k_tl]=r});
+  document.getElementById('matrixTable').innerHTML=D.matrix.h_plate_values_W_m2K.map(h=>'<tr><td>'+h+'</td>'+D.matrix.k_tl_values_W_mK.map(k=>{const r=(g[h]||{})[k];if(!r)return'<td class="note">—</td>';if(r.status==='inferred')return'<td class="i">Cascade, inferred (not run)</td>';return r.outcome==='cascade'?`<td class="c">Cascade · 2nd @ ${r.second_ignition_min} min</td>`:'<td class="a">Arrested at cell 1</td>'}).join('')+'</tr>').join('');
+  S.table('scaleTable',[['Adiabatic rise, 110 kJ into '+f(sc.cell_mass_kg,3)+' kg',`${f(sc.adiabatic_dT_K)} K → ${f(sc.adiabatic_peak_C)} °C`],['Radial diffusion time, 4680 (R = 23 mm, k = 1)',`${f(sc.tau_radial_4680_s)} s ≈ ${f(sc.tau_radial_4680_s/60)} min`],['Radial diffusion time, 2170 (R = 10.5 mm)',`${f(sc.tau_radial_2170_s)} s ≈ ${f(sc.tau_radial_2170_s/60)} min`],['Axial diffusion time, k = 30, 40 mm half-height',`${f(sc.tau_axial_4680_s)} s`],['Biot number, h = 100 / 500 / 2,000',`${f(sc.biot[100],1)} / ${f(sc.biot[500],1)} / ${f(sc.biot[2000])}`],['Volume ratio 4680 / stock 21 × 70 mm cell',`${f(sc.volume_ratio_4680_over_stock,2)}×`],['h_eff for R_cap 10⁻³ / 10⁻⁵ at h_plate 2,000',`${f(sc.h_eff_tabbed)} / ${f(sc.h_eff_tabless)} W/m²·K`]]);
+  const sw=(h,k)=>L.sweep.find(x=>x.h_plate===h&&x.k_tl===k); const cas=sw(2000,1.0), rc=L.contact_resistance_check;
+  S.table('cmpTable',[['Threshold at h = 500','between 1.0 and 1.25',`${sw(500,1.0).cascade?'cascade':'arrested'} at 1.0, ${sw(500,1.25).cascade?'cascade':'arrested'} at 1.25`,sw(500,1.0).cascade&&!sw(500,1.25).cascade?'yes':'no'],['k = 1.25 with no cooling','cascade',sw(0,1.25).cascade?'cascade':'arrested',sw(0,1.25).cascade?'yes':'no'],['k = 1.25 at h = 100','arrested',sw(100,1.25).cascade?'cascade':'arrested',sw(100,1.25).cascade?'no':'yes'],['Second ignition, k = 1.0, h = 2,000','22.9 min',`${cas.second_ignition_min} min`,Math.abs(cas.second_ignition_min-22.9)<3?'yes':'no'],['Cells failed within the hour below threshold','about 13 of 20',`${cas.n_ignited} of 20`,Math.abs(cas.n_ignited-13)<=2?'yes':'no'],['100× change in R_cap','about 20 s out of 23 min',`neighbour peak moves ${Math.abs(rc['tabbed_R_cap_1e-3'].neighbour_peak_C-rc['tabless_R_cap_1e-5'].neighbour_peak_C).toFixed(2)} K`,'yes']]);
+  const labels={p1:['Phase 1 · contact resistance','h = 2,000, k = 1.0: R_cap 10⁻³ vs 10⁻⁵'],p2:['Phase 2 · through-layer sweep','h = 2,000: cascade at 1.0, arrested at 1.25, 1.5, 2.0'],p3:['Phase 3 · cooling check','h = 500: same threshold'],p4:['Phase 4 · adiabatic stress test','k = 1.25: h = 0 cascades, h = 100 arrests']};
+  S.steps('#phaseSteps .step',k=>{document.getElementById('phaseLabel').innerHTML=`<b>${labels[k][0]}</b>${labels[k][1]}`});
+});
+</script>
+</body>
+</html>

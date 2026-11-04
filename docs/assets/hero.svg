@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" width="1600" height="500" role="img" aria-label="Thermal runaway propagation in a 20-cell 4680 pack: top view of the pack with the cascade playing, next to the headline numbers">
+<style>
+.t{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.h{font-size:54px;font-weight:800;fill:#e6edf3;letter-spacing:-1.5px}.sub{font-size:21px;fill:#8b98a9}.big{font-size:34px;font-weight:800;fill:#22d3ee}.small{font-size:16px;fill:#8b98a9}.foot{font-size:15px;fill:#5b6676}.lab{font-size:13px;fill:#8b98a9}
+.hot{opacity:0;animation:ignite 16.0s linear infinite}
+@keyframes ignite{0%{opacity:0}1%{opacity:1}81.2%{opacity:1}81.31%{opacity:1}99%{opacity:1}100%{opacity:0}}
+.c0 .hot{animation-delay:1.24s}
+.c1 .hot{animation-delay:6.25s}
+.c2 .hot{animation-delay:7.94s}
+.c3 .hot{animation-delay:9.98s}
+.c4 .hot{animation-delay:11.84s}
+.c5 .hot{animation-delay:6.25s}
+.c6 .hot{animation-delay:7.00s}
+.c7 .hot{animation-delay:8.50s}
+.c8 .hot{animation-delay:10.31s}
+.c9 .hot{animation-delay:12.08s}
+.c10 .hot{animation-delay:7.94s}
+.c11 .hot{animation-delay:8.50s}
+.c12 .hot{animation-delay:9.44s}
+.c13 .hot{animation-delay:10.88s}
+.c14 .hot{animation-delay:12.49s}
+.c15 .hot{animation-delay:9.96s}
+.c16 .hot{animation-delay:10.30s}
+.c17 .hot{animation-delay:10.87s}
+.c18 .hot{animation-delay:11.75s}
+.c19 .hot{animation-delay:13.00s}
+.st{opacity:0;animation:cycle 16s infinite}.s1{animation-delay:4s}.s2{animation-delay:8s}.s3{animation-delay:12s}
+@keyframes cycle{0%,22%{opacity:1}25%,97%{opacity:0}100%{opacity:1}}
+#clock{transform-origin:960px 464px;transform:scaleX(0);animation:clock 16.0s linear infinite}@keyframes clock{0%{transform:scaleX(0)}81.2%{transform:scaleX(1)}100%{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.hot,.st,#clock{animation:none}.hot{opacity:1}.s0{opacity:1}}
+</style>
+<rect width="1600" height="500" fill="#0b1220"/>
+<g class="t">
+<text x="80" y="120" class="h">Thermal runaway propagation</text><text x="80" y="178" class="h">in a 20-cell 4680 pack</text>
+<text x="80" y="218" class="sub">COMSOL Multiphysics 6.4 · Battery Design Module · transient electro-thermal FEA</text>
+<g class="st s0"><text x="80" y="268" class="big">1.0 → 1.25 W/m·K</text><text x="80" y="300" class="small">sharp cascade threshold in through-layer (radial) conductivity</text></g><g class="st s1"><text x="80" y="268" class="big">13 of 20 cells</text><text x="80" y="300" class="small">cascade within an hour below the threshold; above it, arrested at cell 1</text></g><g class="st s2"><text x="80" y="268" class="big">110 kJ per cell</text><text x="80" y="300" class="small">mass-scaled runaway energy, 80 °C trigger, 20-cell 5s4p 4680 pack</text></g><g class="st s3"><text x="80" y="268" class="big">12 studies</text><text x="80" y="300" class="small">transient one-hour COMSOL runs, cooling 0 to 2,000 W/m²·K</text></g>
+<text x="80" y="396" class="foot">Adapted from COMSOL's validated pack-propagation model · 46 × 80 mm cells · 25 Ah · 291,000 elements</text>
+<text x="80" y="422" class="foot">Animation: ignition order from the reduced-order surrogate in this repository (k_tl = 1.0, h = 2,000),</text>
+<text x="80" y="446" class="foot">not the COMSOL run · open the live page for the 3D pack and the COMSOL run matrix</text>
+<text x="960" y="40" class="lab">Top view, 5s4p. Cell 1 (corner) forced at 1 min; neighbours trigger at 80 °C.</text>
+</g>
+<rect x="940" y="52" width="500" height="386" rx="18" fill="none" stroke="#1f2a3c"/>
+<g class="cell c0"><circle cx="1000" cy="108" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1000" cy="108" r="44" class="hot" fill="#f97316"/><circle cx="1000" cy="108" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c1"><circle cx="1096" cy="108" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1096" cy="108" r="44" class="hot" fill="#f97316"/><circle cx="1096" cy="108" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c2"><circle cx="1192" cy="108" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1192" cy="108" r="44" class="hot" fill="#f97316"/><circle cx="1192" cy="108" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c3"><circle cx="1288" cy="108" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1288" cy="108" r="44" class="hot" fill="#f97316"/><circle cx="1288" cy="108" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c4"><circle cx="1384" cy="108" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1384" cy="108" r="44" class="hot" fill="#f97316"/><circle cx="1384" cy="108" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c5"><circle cx="1000" cy="204" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1000" cy="204" r="44" class="hot" fill="#f97316"/><circle cx="1000" cy="204" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c6"><circle cx="1096" cy="204" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1096" cy="204" r="44" class="hot" fill="#f97316"/><circle cx="1096" cy="204" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c7"><circle cx="1192" cy="204" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1192" cy="204" r="44" class="hot" fill="#f97316"/><circle cx="1192" cy="204" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c8"><circle cx="1288" cy="204" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1288" cy="204" r="44" class="hot" fill="#f97316"/><circle cx="1288" cy="204" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c9"><circle cx="1384" cy="204" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1384" cy="204" r="44" class="hot" fill="#f97316"/><circle cx="1384" cy="204" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c10"><circle cx="1000" cy="300" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1000" cy="300" r="44" class="hot" fill="#f97316"/><circle cx="1000" cy="300" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c11"><circle cx="1096" cy="300" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1096" cy="300" r="44" class="hot" fill="#f97316"/><circle cx="1096" cy="300" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c12"><circle cx="1192" cy="300" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1192" cy="300" r="44" class="hot" fill="#f97316"/><circle cx="1192" cy="300" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c13"><circle cx="1288" cy="300" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1288" cy="300" r="44" class="hot" fill="#f97316"/><circle cx="1288" cy="300" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c14"><circle cx="1384" cy="300" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1384" cy="300" r="44" class="hot" fill="#f97316"/><circle cx="1384" cy="300" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c15"><circle cx="1000" cy="396" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1000" cy="396" r="44" class="hot" fill="#f97316"/><circle cx="1000" cy="396" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c16"><circle cx="1096" cy="396" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1096" cy="396" r="44" class="hot" fill="#f97316"/><circle cx="1096" cy="396" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c17"><circle cx="1192" cy="396" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1192" cy="396" r="44" class="hot" fill="#f97316"/><circle cx="1192" cy="396" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c18"><circle cx="1288" cy="396" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1288" cy="396" r="44" class="hot" fill="#f97316"/><circle cx="1288" cy="396" r="10" fill="#0b1220" opacity=".6"/></g><g class="cell c19"><circle cx="1384" cy="396" r="44" fill="#334155" stroke="#1f2a3c" stroke-width="2"/><circle cx="1384" cy="396" r="44" class="hot" fill="#f97316"/><circle cx="1384" cy="396" r="10" fill="#0b1220" opacity=".6"/></g>
+<rect x="960" y="462" width="460" height="4" rx="2" fill="#1f2a3c"/><rect id="clock" x="960" y="462" width="460" height="4" rx="2" fill="#22d3ee"/>
+<text x="960" y="452" class="t lab">simulated time, 0 to 60 min</text>
+</svg>
