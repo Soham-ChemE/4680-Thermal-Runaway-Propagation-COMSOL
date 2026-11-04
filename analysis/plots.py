@@ -34,7 +34,7 @@ def phase_map(m, theme, lumped=None):
                 ax.add_patch(Rectangle((j, i), 1, 1, facecolor="none", edgecolor=muted, lw=.6, ls=":")); ax.text(j + .5, i + .5, "not run", ha="center", va="center", fontsize=7.5, color=muted); continue
             col = INFER if r["status"] == "inferred" else (CASCADE if r["outcome"] == "cascade" else ARREST)
             ax.add_patch(Rectangle((j, i), 1, 1, facecolor=col, alpha=.85 if r["status"] == "run" else .45, edgecolor=bg, lw=2, hatch="//" if r["status"] == "inferred" else None))
-            lab = "inferred\nnot run" if r["status"] == "inferred" else ("cascade\n2nd @ %g min" % r["second_ignition_min"] if r["outcome"] == "cascade" else "arrested\nat cell 1")
+            lab = "cascade\n(inferred)" if r["status"] == "inferred" else ("cascade\n2nd @ %g min" % r["second_ignition_min"] if r["outcome"] == "cascade" else "arrested\nat cell 1")
             ax.text(j + .5, i + .5, lab, ha="center", va="center", fontsize=8, color="#0b1220" if r["status"] == "run" else ink, fontweight="bold")
     ax.set_xlim(0, len(ks)); ax.set_ylim(0, len(hs)); ax.set_xticks(np.arange(len(ks)) + .5); ax.set_xticklabels([f"{k:g}" for k in ks]); ax.set_yticks(np.arange(len(hs)) + .5); ax.set_yticklabels([str(h) for h in hs])
     ax.set_xlabel("Through-layer (radial) conductivity k_tl, W/m·K"); ax.set_ylabel("Base cooling h_plate, W/m²·K")
@@ -76,7 +76,7 @@ def lumped_figs(theme, sweep_path=ROOT / "results" / "lumped_sweep.json"):
             ax.text(j + .5, i + .5, lab, ha="center", va="center", fontsize=7.5, color="#0b1220", fontweight="bold")
     ax.set_xlim(0, len(ks)); ax.set_ylim(0, len(hs)); ax.set_xticks(np.arange(len(ks)) + .5); ax.set_xticklabels([f"{k:g}" for k in ks]); ax.set_yticks(np.arange(len(hs)) + .5); ax.set_yticklabels([str(h) for h in hs])
     ax.set_xlabel("Through-layer conductivity k_tl, W/m·K"); ax.set_ylabel("Base cooling h_plate, W/m²·K")
-    ax.set_title(f"Reduced-order surrogate (built here, not COMSOL): coupling scale {S['coupling_scale']:g}", fontsize=9)
+    ax.set_title(f"Reduced-order model (built here): coupling scale {S['coupling_scale']:g}", fontsize=9)
     for s in ax.spines.values(): s.set_visible(False)
     ax.tick_params(length=0); out.append(_save(fig, "fig_lumped_phase", theme))
     fig, ax = plt.subplots(figsize=(6.6, 3.8)); _style(ax, ink, muted)
@@ -84,7 +84,7 @@ def lumped_figs(theme, sweep_path=ROOT / "results" / "lumped_sweep.json"):
         tr = S["traces"][key]; t = np.array(tr["t_min"]); T = np.array(tr["cell_max_C"])
         for c in range(T.shape[1]): ax.plot(t, T[:, c], color=col, lw=.9, alpha=.75, label=f"{lab}: {key.replace('_', ' ')}" if c == 0 else None)
     ax.axhline(80, color=ink, lw=1, ls="--"); ax.text(1, 84, "80 °C trigger", fontsize=8, color=ink)
-    ax.set_xlabel("Time, min"); ax.set_ylabel("Cell maximum temperature, °C"); ax.legend(fontsize=8, frameon=False, labelcolor=ink); ax.set_title("Surrogate: per-cell maximum temperature, 20 cells", fontsize=9)
+    ax.set_xlabel("Time, min"); ax.set_ylabel("Cell maximum temperature, °C"); ax.legend(fontsize=8, frameon=False, labelcolor=ink); ax.set_title("Reduced-order model: per-cell maximum temperature, 20 cells", fontsize=9)
     out.append(_save(fig, "fig_lumped_traces", theme)); return out
 
 

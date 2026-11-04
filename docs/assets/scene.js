@@ -39,7 +39,8 @@ const M = D.matrix.model, L = D.lumped; const NX = 5, NY = 4, PITCH = .48, R = .
   const plate = new THREE.Mesh(new THREE.BoxGeometry(NX * PITCH + .3, .06, NY * PITCH + .3), plateMat); plate.position.y = -H / 2 - .09; pack.add(plate);
   const wrap = new THREE.Mesh(new THREE.BoxGeometry(NX * PITCH + .12, H + .2, NY * PITCH + .12), new THREE.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: .05, roughness: .1, side: THREE.DoubleSide, depthWrite: false })); pack.add(wrap);
   const grid = new THREE.GridHelper(10, 20, 0x1f2a3c, 0x1f2a3c); grid.position.y = -H / 2 - .13; grid.material.transparent = true; grid.material.opacity = .35; scene.add(grid);
-  st.onTheme = dark => { grid.material.color.set(dark ? 0x1f2a3c : 0xcbd5e1); st.dirty = true; };
+  const hemi = scene.children.find(o => o.isHemisphereLight);
+  st.onTheme = dark => { grid.material.color.set(st.pal.line); hemi.intensity = .8 * st.lights; dl.intensity = 1.4 * st.lights; cool.set(st.pal.cool); warm.set(st.pal.warm); hot.set(st.pal.hot); acr.color.set(st.pal.acrylic); st.dirty = true; };
   st.onTheme(S.isDark());
 
   // ---------- state: which surrogate trace plays, and the simulated clock ----------
@@ -50,7 +51,7 @@ const M = D.matrix.model, L = D.lumped; const NX = 5, NY = 4, PITCH = .48, R = .
   function comsolCell() { const r = D.matrix.runs.find(x => x.h_plate === state.h && x.k_tl === kVals[state.kIdx]); if (!r) return 'not in the COMSOL matrix'; if (r.status === 'inferred') return 'COMSOL: inferred cascade (not run)'; return r.outcome === 'cascade' ? `COMSOL: cascade, 2nd ignition ${r.second_ignition_min} min` : 'COMSOL: arrested at cell 1'; }
   function describe() {
     const tr = trace(), n = tr.ignition_min.filter(v => v !== null).length;
-    kEl.textContent = (+kVals[state.kIdx]).toFixed(2); outEl.textContent = n > 1 ? `Surrogate: cascade, ${n} of 20 cells` : 'Surrogate: arrested at cell 1'; outEl.className = 'pill ' + (n > 1 ? 'bad' : 'good'); comsolEl.textContent = comsolCell();
+    kEl.textContent = (+kVals[state.kIdx]).toFixed(2); outEl.textContent = n > 1 ? `Reduced-order model: cascade, ${n} of 20 cells` : 'Reduced-order model: arrested at cell 1'; outEl.className = 'pill ' + (n > 1 ? 'bad' : 'good'); comsolEl.textContent = comsolCell();
     document.dispatchEvent(new CustomEvent('tr-state', { detail: { ...state, key: traceKey() } }));
   }
   if (slider) { slider.max = kVals.length - 1; slider.value = state.kIdx; slider.addEventListener('input', () => { state.kIdx = +slider.value; state.tMin = 0; describe(); }); }
@@ -86,7 +87,7 @@ const M = D.matrix.model, L = D.lumped; const NX = 5, NY = 4, PITCH = .48, R = .
     (st.wide !== false ? pathWide : pathNarrow).at(reduced ? 1 : T, pos, tgt);
     if (!dragging && camera.position.distanceToSquared(pos) > 1e-6) { camera.position.lerp(pos, reduced ? 1 : .1); changed = true; }
     ctr.target.lerp(tgt, .1); ctr.autoRotate = !reduced && T < .2 && !dragging; if (ctr.autoRotate || dragging) changed = true; ctr.update();
-    if (st.bloom) st.bloom.strength = .22 + .2 * S.hero.glow; if (st.bokeh) st.bokeh.uniforms.focus.value = camera.position.distanceTo(ctr.target);
+    st.setBloom(.22 + .2 * S.hero.glow); if (st.bokeh) st.bokeh.uniforms.focus.value = camera.position.distanceTo(ctr.target);
     if (Math.abs(T - lastT) > 1e-4) { lastT = T; changed = true; }
     return changed;
   });
