@@ -1,0 +1,47 @@
+{
+  "description": "Run matrix of the 4680 thermal runaway propagation study (COMSOL Multiphysics 6.4, Battery Design Module). Every entry is transcribed from the project notes; nothing here was computed in this repository. Sources: section A = the author's project note ('4680 Thermal Runaway Propagation Project'), section B = the SHPE deep-dive section, CV = the resume entry (2026-10).",
+  "model": {
+    "base": "COMSOL Application Library 'Thermal Runaway Propagation in a Battery Pack' (Application ID 107571), Battery Design Module",
+    "pack": "20 cells, 5s4p, 2 mm gaps, acrylic holders, steel AISI 4340 connectors, air compartment, plastic wrapping (stock layout)",
+    "cell_diameter_mm": 46, "cell_height_mm": 80, "capacity_Ah": 25, "runaway_energy_kJ": 110,
+    "density_kg_m3": 2000, "cp_J_kgK": 1400, "k_in_layer_W_mK": 30, "k_through_layer_stock_W_mK": 1.0,
+    "trigger_C": 80, "initiating_cell_time_min": 1, "pulse": "triangular, peak 36,667 W at t = 1 s, ends at 6 s",
+    "ambient_h_W_m2K": 10, "ambient_T_C": 30, "cooled_boundary": "pack floor (boundary 23), h_eff = 1/(1/h_plate + R_cap)",
+    "mesh_elements": 291236, "domains": 231, "boundaries": 1588, "study_minutes": 60, "output_every_min": 5, "initial_step_s": 0.1,
+    "R_cap_m2K_W": 1e-5,
+    "source": "section A §3 model specification; section B step 4"
+  },
+  "swept_parameter": {"name": "kT_batt_tl", "meaning": "through-layer (radial, across the windings) thermal conductivity of the homogenised cell", "units": "W/m·K", "never_changed": {"kT_batt_il": 30}, "source": "section A §0.1"},
+  "h_plate_values_W_m2K": [0, 100, 500, 2000, 5000],
+  "k_tl_values_W_mK": [1.0, 1.25, 1.5, 2.0],
+  "runs": [
+    {"h_plate": 2000, "k_tl": 1.0,  "outcome": "cascade",   "second_ignition_min": 22.9, "status": "run",      "note": "tabless R_cap = 1e-5; about 13 further ignitions between ~23 and ~52 min read from pack-max and pack-average probe kinks", "source": "section A §2 Phase 1-2, full results matrix; section B step 6, 9"},
+    {"h_plate": 2000, "k_tl": 1.25, "outcome": "arrested",  "second_ignition_min": null, "status": "run", "source": "section A §2 Phase 2; section B step 6"},
+    {"h_plate": 2000, "k_tl": 1.5,  "outcome": "arrested",  "second_ignition_min": null, "status": "run", "source": "section A §2 Phase 2; section B step 6"},
+    {"h_plate": 2000, "k_tl": 2.0,  "outcome": "arrested",  "second_ignition_min": null, "status": "run", "source": "section A §2 Phase 2; section B step 6"},
+    {"h_plate": 500,  "k_tl": 1.0,  "outcome": "cascade",   "second_ignition_min": 22.4, "status": "run", "source": "section A §2 Phase 3; section B step 7"},
+    {"h_plate": 500,  "k_tl": 1.25, "outcome": "arrested",  "second_ignition_min": null, "status": "run", "source": "section A §2 Phase 3; section B step 7"},
+    {"h_plate": 500,  "k_tl": 1.5,  "outcome": "arrested",  "second_ignition_min": null, "status": "run", "source": "section A §2 Phase 3; section B step 7"},
+    {"h_plate": 0,    "k_tl": 1.25, "outcome": "cascade",   "second_ignition_min": 26.9, "status": "run", "note": "adiabatic stress test; pack average about 260 °C at 61 min", "source": "section A §2 Phase 4; section B step 8"},
+    {"h_plate": 100,  "k_tl": 1.25, "outcome": "arrested",  "second_ignition_min": null, "status": "run", "note": "adiabatic stress test counterpart", "source": "section A §2 Phase 4; section B step 8"},
+    {"h_plate": 5000, "k_tl": 2.0,  "outcome": "arrested",  "second_ignition_min": null, "status": "run", "note": "side run", "source": "section A §2 Phase 2"},
+    {"h_plate": 0,    "k_tl": 1.0,  "outcome": "cascade",   "second_ignition_min": null, "status": "inferred", "note": "NOT RUN. Listed as cascade in an earlier plan; the note's correction §0.5 says it was inferred, not run. Shown as inferred everywhere in this repository.", "source": "section A §0.5 and full results matrix; section B §2.6 ('not run (expected cascade)')"}
+  ],
+  "contact_resistance_runs": {
+    "description": "Phase 1: cap contact resistance R_cap in h_eff = 1/(1/h_plate + R_cap) on the pack floor, h_plate = 2000, k_tl = 1.0 (stock)",
+    "runs": [
+      {"label": "tabbed",  "R_cap_m2K_W": 1e-3, "h_eff_W_m2K": 667,  "second_ignition_min": 22.6},
+      {"label": "tabless", "R_cap_m2K_W": 1e-5, "h_eff_W_m2K": 1961, "second_ignition_min": 22.9}
+    ],
+    "result": "a 100x change in R_cap moved the second ignition by about 0.3 min (about 20 s) out of about 23 min",
+    "diagnosis": "boundary 23 is the pack enclosure floor, behind a few millimetres of acrylic holder (k about 0.19 W/m·K, about 5e-3 to 1e-2 m²·K/W), which is larger than the tabbed R_cap; h_eff is also capped by h_plate",
+    "source": "section A §2 Phase 1; section B step 5"
+  },
+  "cascade_pace": {"h_plate": 2000, "k_tl": 1.0, "further_ignitions": 13, "window_min": [23, 52], "rate_cells_per_min": 0.45, "method": "kinks in pack-max and pack-average temperature probes, not per-cell probes; approximate", "source": "section A §2 'Cascade pace'; section B step 9"},
+  "exploration_on_stock_model": {
+    "description": "Day-1 runs on the stock pack (21 x 70 mm cells, 2.5 Ah, 32 kJ per the note), not the 4680 model",
+    "eta_1C_sweep": {"eta_1C_mV": [9.0, 4.5, 2.25, 1.0], "second_ignition_delay_min": [6.7, 6.7, 7.1, 7.2], "conclusion": "small and saturating"},
+    "source": "section A §2 Phase 0; section B step 3"
+  },
+  "study_count": {"transient_one_hour_studies": 12, "source": "CV; section A §0.6; section B §2.2", "note": "The matrix above lists 10 run cells plus the tabbed contact-resistance run (11 distinct runs identified in the notes); the notes do not individually identify the twelfth."}
+}
