@@ -9,3 +9,4 @@ python -m analysis.export
 python -m analysis.plots
 python -m analysis.hero
 python -m pytest -q
+# python docs/build_assets.py   # static fallbacks for the 3D body scenes, both-theme screenshots and Lighthouse (needs playwright + lighthouse)

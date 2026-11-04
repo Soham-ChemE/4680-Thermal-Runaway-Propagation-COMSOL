@@ -44,8 +44,8 @@ def main():
 <text x="80" y="218" class="sub">COMSOL Multiphysics 6.4 · Battery Design Module · transient electro-thermal FEA</text>
 {stats}
 <text x="80" y="396" class="foot">Adapted from COMSOL's validated pack-propagation model · 46 × 80 mm cells · 25 Ah · 291,000 elements</text>
-<text x="80" y="422" class="foot">Animation: ignition order from the reduced-order surrogate in this repository (k_tl = 1.0, h = 2,000),</text>
-<text x="80" y="446" class="foot">not the COMSOL run · open the live page for the 3D pack and the COMSOL run matrix</text>
+<text x="80" y="422" class="foot">Animation: ignition order from the reduced-order model in this repository (k_tl = 1.0, h = 2,000)</text>
+<text x="80" y="446" class="foot">Open the live page for the 3D pack, the run matrix as a tile field and every figure in 3D</text>
 <text x="960" y="40" class="lab">Top view, 5s4p. Cell 1 (corner) forced at 1 min; neighbours trigger at 80 °C.</text>
 </g>
 <rect x="940" y="52" width="500" height="386" rx="18" fill="none" stroke="#1f2a3c"/>
